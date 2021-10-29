@@ -275,6 +275,10 @@ impl TypedClient {
 		let returns = returns.to_owned();
 		let args =
 			serde_json::to_value(args).expect("Only types with infallible serialisation can be used for JSON-RPC");
+
+		println!("method: {}", method);
+		println!("args: {}", serde_json::to_string_pretty(&args).unwrap());
+
 		let params = match args {
 			Value::Array(vec) => Ok(Params::Array(vec)),
 			Value::Null => Ok(Params::None),
@@ -288,7 +292,7 @@ impl TypedClient {
 		async move {
 			let value: Value = result?.await?;
 
-			log::debug!("response: {:?}", value);
+			println!("response: {}", serde_json::to_string_pretty(&value).unwrap());
 
 			serde_json::from_value::<R>(value).map_err(|error| RpcError::ParseError(returns, Box::new(error)))
 		}
